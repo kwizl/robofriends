@@ -1,14 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
-import ErrorBoundry from '../components/ErrorBoundry'
+import ErrorBoundry from '../components/ErrorBoundry';
 import '../App.css';
+
+import { setSearchField } from '../actions';
+
+const mapStateToProps = state => {
+  return {
+    searchField: state.searchRobots
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onSearchChange: (event) => {
+    dispatch(setSearchField(event.target.value));
+  }}
+}
 
 function App() {
   const [robots, setRobots] = useState([]);
-  const [searchfield, setSearchfield] = useState('');
+  const [searchField, setSearchField] = useState('');
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/users').then(response => {
       return response.json();
@@ -19,14 +36,15 @@ function App() {
   }, [count]); // only run if count changes
 
   const onSearchChange = (event) => {
-    setSearchfield(event.target.value);
+    setSearchField(event.target.value);
   }
 
   const filteredRobots = robots.filter(robot => {
-    return robot.name.toLowerCase().includes(searchfield.toLowerCase())
+    return robot.name.toLowerCase().includes(searchField.toLowerCase())
   });
 
-  console.log(robots, searchfield);
+  console.log(robots, searchField);
+
   return !robots.length ?
   <h1>Loading</h1> :
   (
@@ -43,4 +61,4 @@ function App() {
   )
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
